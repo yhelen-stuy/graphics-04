@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math"
 )
 
 type Matrix struct {
@@ -41,16 +42,69 @@ func (m *Matrix) Ident() error {
 	return nil
 }
 
-func (m2 *Matrix) Mult(m1 Matrix) (*Matrix, error) {
+func MakeTranslate(x, y, z float64) *Matrix {
+	mat := MakeMatrix(4, 0)
+	mat.AddCol([]float64{1, 0, 0, 0})
+	mat.AddCol([]float64{0, 1, 0, 0})
+	mat.AddCol([]float64{0, 0, 1, 0})
+	mat.AddCol([]float64{25, 0, 0, 1})
+	return mat
+}
+
+func MakeScale(x, y, z float64) *Matrix {
+	mat := MakeMatrix(4, 0)
+	mat.AddCol([]float64{x, 0, 0, 0})
+	mat.AddCol([]float64{0, y, 0, 0})
+	mat.AddCol([]float64{0, 0, z, 0})
+	mat.AddCol([]float64{0, 0, 0, 1})
+	return mat
+}
+
+func degreesToRadians(degrees float64) float64 {
+	return degrees * math.Pi / 180
+}
+
+func MakeRotX(degrees float64) *Matrix {
+	theta := degreesToRadians(degrees)
+	mat := MakeMatrix(4, 0)
+	mat.AddCol([]float64{1, 0, 0, 0})
+	mat.AddCol([]float64{0, math.Cos(theta), math.Sin(theta), 0})
+	mat.AddCol([]float64{0, -math.Sin(theta), math.Cos(theta), 0})
+	mat.AddCol([]float64{0, 0, 0, 1})
+	return mat
+}
+
+func MakeRotY(degrees float64) *Matrix {
+	theta := degreesToRadians(degrees)
+	mat := MakeMatrix(4, 0)
+	mat.AddCol([]float64{math.Cos(theta), 0, math.Sin(theta), 0})
+	mat.AddCol([]float64{0, 1, 0, 0})
+	mat.AddCol([]float64{-math.Sin(theta), 0, math.Cos(theta), 0})
+	mat.AddCol([]float64{0, 0, 0, 1})
+	return mat
+}
+
+func MakeRotZ(degrees float64) *Matrix {
+	theta := degreesToRadians(degrees)
+	mat := MakeMatrix(4, 0)
+	mat.AddCol([]float64{math.Cos(theta), math.Sin(theta), 0, 0})
+	mat.AddCol([]float64{-math.Sin(theta), math.Cos(theta), 0, 0})
+	mat.AddCol([]float64{0, 0, 1, 0})
+	mat.AddCol([]float64{0, 0, 0, 1})
+	return mat
+}
+
+// m1 * m2
+func (m2 *Matrix) Mult(m1 *Matrix) (*Matrix, error) {
 	// TODO: Make sure it works on non identity matrix
-	if m1.rows != m2.cols {
-		return nil, errors.New("Error: dimensions incompatible")
+	if m2.rows != m1.cols {
+		return nil, fmt.Errorf("Error: dimensions incompatible %d x %d * %d x %d\n", m1.rows, m1.cols, m2.rows, m2.cols)
 	}
-	prod := MakeMatrix(m2.rows, m1.cols)
+	prod := MakeMatrix(m1.rows, m2.cols)
 	for r1 := 0; r1 < m1.rows; r1++ {
 		for c2 := 0; c2 < m2.cols; c2++ {
 			for rc := 0; rc < m1.cols; rc++ {
-				prod.mat[r1][c2] += m2.mat[r1][rc] * m1.mat[rc][c2]
+				prod.mat[r1][c2] += m1.mat[r1][rc] * m2.mat[rc][c2]
 			}
 		}
 	}
