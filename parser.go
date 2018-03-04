@@ -19,18 +19,22 @@ func ParseFile(filename string, t *Matrix, e *Matrix, image *Image) error {
 	for scanner.Scan() {
 		switch c := strings.TrimSpace(scanner.Text()); c {
 		case "line":
+			fmt.Println("line")
 			scanner.Scan()
 			arg := strings.TrimSpace(scanner.Text())
 			args := strings.Fields(arg)
 			if len(args) != 6 {
-				fmt.Errorf("Scale: Incorrect # of args. Got: %d, expected: 6\n", len(args))
+				fmt.Errorf("Line: Incorrect # of args. Got: %d, expected: 6\n", len(args))
 			}
 			fargs := numerize(args)
-			fmt.Printf("unfinished line")
-			fmt.Println(fargs)
+			e.AddEdge(fargs[0], fargs[1], fargs[2], fargs[3], fargs[4], fargs[5])
+
 		case "ident":
+			fmt.Println("ident")
 			t.Ident()
+
 		case "scale":
+			fmt.Println("scale")
 			scanner.Scan()
 			arg := strings.TrimSpace(scanner.Text())
 			args := strings.Fields(arg)
@@ -40,36 +44,75 @@ func ParseFile(filename string, t *Matrix, e *Matrix, image *Image) error {
 			fargs := numerize(args)
 			scale := MakeScale(fargs[0], fargs[1], fargs[2])
 			t, _ = t.Mult(scale)
-		case "translate":
+
+		case "move":
+			fmt.Println("move")
 			scanner.Scan()
 			arg := strings.TrimSpace(scanner.Text())
 			args := strings.Fields(arg)
 			if len(args) != 3 {
-				fmt.Errorf("Scale: Incorrect # of args. Got: %d, expected: 3\n", len(args))
+				fmt.Errorf("Translate: Incorrect # of args. Got: %d, expected: 3\n", len(args))
 			}
 			fargs := numerize(args)
 			translate := MakeTranslate(fargs[0], fargs[1], fargs[2])
 			t, _ = t.Mult(translate)
+
 		case "rotate":
-			fmt.Println("unfinished rotate")
+			fmt.Println("rotate")
+			scanner.Scan()
+			arg := strings.TrimSpace(scanner.Text())
+			args := strings.Fields(arg)
+			if len(args) != 2 {
+				fmt.Errorf("Rotate: Incorrect # of args. Got: %d, expected: 3\n", len(args))
+			}
+			// TODO: Error handling
+			deg, _ := strconv.ParseFloat(args[1], 64)
+			switch args[0] {
+			case "x":
+				rot := MakeRotX(deg)
+				t, _ = t.Mult(rot)
+			case "y":
+				rot := MakeRotY(deg)
+				t, _ = t.Mult(rot)
+			case "z":
+				rot := MakeRotZ(deg)
+				t, _ = t.Mult(rot)
+			default:
+				// TODO: Error handling
+				fmt.Println("Rotate fail")
+				continue
+			}
+
 		case "apply":
-			e.Mult(t)
+			fmt.Println("apply")
+			fmt.Println(t)
+			// TODO: Error handling
+			e, _ = e.Mult(t)
+
 		case "display":
+			fmt.Println("display")
+			image.Clear()
 			image.DrawLines(e, Color{r: 0, b: 0, g: 255})
 			image.Display()
+
 		case "save":
+			fmt.Println("save")
 			scanner.Scan()
 			arg := strings.TrimSpace(scanner.Text())
 			args := strings.Fields(arg)
 			if len(args) != 1 {
 				fmt.Errorf("Scale: Incorrect # of args. Got: %d, expected: 3\n", len(args))
 			}
+			image.Clear()
 			image.DrawLines(e, Color{r: 0, b: 0, g: 255})
 			image.SavePPM(args[0])
+
 		case "quit":
+			fmt.Println("quitting")
 			break
+
 		default:
-			fmt.Println(c)
+			return errors.New("Invalid command")
 		}
 	}
 	return nil
