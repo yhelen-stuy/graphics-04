@@ -47,7 +47,7 @@ func MakeTranslate(x, y, z float64) *Matrix {
 	mat.AddCol([]float64{1, 0, 0, 0})
 	mat.AddCol([]float64{0, 1, 0, 0})
 	mat.AddCol([]float64{0, 0, 1, 0})
-	mat.AddCol([]float64{25, 0, 0, 1})
+	mat.AddCol([]float64{x, y, z, 1})
 	return mat
 }
 

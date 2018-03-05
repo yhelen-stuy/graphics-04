@@ -22,6 +22,7 @@ func main() {
 	mat, _ = mat.Mult(transform)
 	image.DrawLines(mat, Color{r: 0, b: 255, g: 0})
 	image.Display()
+	image.SavePPM("temp.ppm")
 
 	rotz := MakeRotZ(20.0)
 	fmt.Println(mat)
