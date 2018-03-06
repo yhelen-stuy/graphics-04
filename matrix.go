@@ -77,9 +77,9 @@ func MakeRotX(degrees float64) *Matrix {
 func MakeRotY(degrees float64) *Matrix {
 	theta := degreesToRadians(degrees)
 	mat := MakeMatrix(4, 0)
-	mat.AddCol([]float64{math.Cos(theta), 0, math.Sin(theta), 0})
+	mat.AddCol([]float64{math.Cos(theta), 0, -math.Sin(theta), 0})
 	mat.AddCol([]float64{0, 1, 0, 0})
-	mat.AddCol([]float64{-math.Sin(theta), 0, math.Cos(theta), 0})
+	mat.AddCol([]float64{math.Sin(theta), 0, math.Cos(theta), 0})
 	mat.AddCol([]float64{0, 0, 0, 1})
 	return mat
 }

@@ -19,7 +19,6 @@ func ParseFile(filename string, t *Matrix, e *Matrix, image *Image) error {
 	for scanner.Scan() {
 		switch c := strings.TrimSpace(scanner.Text()); c {
 		case "line":
-			fmt.Println("line")
 			scanner.Scan()
 			arg := strings.TrimSpace(scanner.Text())
 			args := strings.Fields(arg)
@@ -30,11 +29,9 @@ func ParseFile(filename string, t *Matrix, e *Matrix, image *Image) error {
 			e.AddEdge(fargs[0], fargs[1], fargs[2], fargs[3], fargs[4], fargs[5])
 
 		case "ident":
-			fmt.Println("ident")
 			t.Ident()
 
 		case "scale":
-			fmt.Println("scale")
 			scanner.Scan()
 			arg := strings.TrimSpace(scanner.Text())
 			args := strings.Fields(arg)
@@ -46,7 +43,6 @@ func ParseFile(filename string, t *Matrix, e *Matrix, image *Image) error {
 			t, _ = t.Mult(scale)
 
 		case "move":
-			fmt.Println("move")
 			scanner.Scan()
 			arg := strings.TrimSpace(scanner.Text())
 			args := strings.Fields(arg)
@@ -58,7 +54,6 @@ func ParseFile(filename string, t *Matrix, e *Matrix, image *Image) error {
 			t, _ = t.Mult(translate)
 
 		case "rotate":
-			fmt.Println("rotate")
 			scanner.Scan()
 			arg := strings.TrimSpace(scanner.Text())
 			args := strings.Fields(arg)
@@ -67,15 +62,19 @@ func ParseFile(filename string, t *Matrix, e *Matrix, image *Image) error {
 			}
 			// TODO: Error handling
 			deg, _ := strconv.ParseFloat(args[1], 64)
+			fmt.Printf("rotating %s by %.2f\n", args[0], deg)
 			switch args[0] {
 			case "x":
 				rot := MakeRotX(deg)
+				fmt.Println(rot)
 				t, _ = t.Mult(rot)
 			case "y":
 				rot := MakeRotY(deg)
+				fmt.Println(rot)
 				t, _ = t.Mult(rot)
 			case "z":
 				rot := MakeRotZ(deg)
+				fmt.Println(rot)
 				t, _ = t.Mult(rot)
 			default:
 				// TODO: Error handling
@@ -84,19 +83,16 @@ func ParseFile(filename string, t *Matrix, e *Matrix, image *Image) error {
 			}
 
 		case "apply":
-			fmt.Println("apply")
 			fmt.Println(t)
 			// TODO: Error handling
 			e, _ = e.Mult(t)
 
 		case "display":
-			fmt.Println("display")
 			image.Clear()
 			image.DrawLines(e, Color{r: 0, b: 0, g: 255})
 			image.Display()
 
 		case "save":
-			fmt.Println("save")
 			scanner.Scan()
 			arg := strings.TrimSpace(scanner.Text())
 			args := strings.Fields(arg)
@@ -108,7 +104,6 @@ func ParseFile(filename string, t *Matrix, e *Matrix, image *Image) error {
 			image.SavePPM(args[0])
 
 		case "quit":
-			fmt.Println("quitting")
 			break
 
 		default:
